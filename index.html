@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4"
+        crossorigin="anonymous">
+    <link rel="stylesheet" href="assets.css">
+</head>
+
+<body>
+    <header style="padding-top:30px">
+        <button type="button" class="btn btn-primary">
+            <div id="teams-here"></div>
+        </button>
+    </header>
+    <div class="container">
+        <div class="row">
+            <div class="col-md">
+                <div id="gifs-appear-here">
+                </div>
+            </div>
+            <div class="col-md">
+                <div id="gifs-appear-here2">
+                </div>
+            </div>
+            <div class="col-md">
+                <div id="gifs-appear-here3">
+                </div>
+            </div>
+            <div class="col-sm">
+                <form id="team-form">
+                    <label for="team-input">Add a Soccer Team</label>
+                    <input type="text" id="team-input">
+                    <br>
+                    <!-- Button triggers new team to be added -->
+                    <input id="add-team" type="submit" value="Add a Soccer Team">
+                </form>
+                <br>
+            </div>
+        </div>
+    </div>
+    </div>
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script type="text/javascript">
+
+
+        var teams = ["Monterrey", "Tigres", "Galaxy", "New York", "Atletico de Madrid", "Madrid", "Chivas"];
+
+        function renderButtons() {
+
+            $("#teams-here").empty();
+
+            for (var i = 0; i < teams.length; i++) {
+                // Then dynamicaly generating buttons for each team in the array.
+                // This code $("<button>") is all jQuery needs to create the start and end tag. (<button></button>)
+                var a = $("<button>");
+                // Adding a class
+                a.addClass("team");
+                // Adding a data-attribute with a value of the team at index i
+                a.attr("data-name", teams[i]);
+                // Providing the button's text with a value of the team at index i
+                a.text(teams[i]);
+
+                // Add button on Click method
+                a.on("click", function () {
+                    var object = $(this).attr("data-name");
+
+                    // Querying the bandsintown api for the selected artist, the ?app_id parameter is required, but can equal anything
+                    var queryURL = "https://api.giphy.com/v1/gifs/search?q=" + object + "&api_key=Cj6giEoY7Q5QuvujZa8PtbFk0ibR0Eiw&limit=5";
+                    $.ajax({
+                        url: queryURL,
+                        method: "GET"
+                    }).then(function (response) {
+
+                        var length = Object.keys(response).length;
+                        // Printing the entire object to console
+                        var results = response.data;
+                        for (var i = 0; i < results.length; i++) {
+                            if (results[i].rating !== "r") {
+                                // Creating a div with the class "item"
+                                var gifDiv = $("<div class='item'>");
+
+                                // Storing the result item's rating
+                                var rating = results[i].rating;
+                                var personImage = $("<img>");
+
+                                // Giving the image tag an src attribute of a proprty pulled off the
+                                // result item
+                                personImage.attr("src", results[i].images.fixed_height.url);
+                                //personImage.attr("src", results[i].images.animated.url);
+                                
+                                // Add another attr to hold the animated image
+                                // Add another attr to hold the still image
+                                // Add attr state to the image
+                                // Add on.click for the image -- this will set the state to animate or still, 
+                                //this should also change the source to the right URL based on the state        
+                                // $(this).attr('data-state') == 'still' -> set state attr animate, 
+                                //set $(this).attr('src', $(this).attr('data-animate'))
+                                // Appending the paragraph and personImage we created to the "gifDiv" div we created
+                                gifDiv.append(personImage);
+
+
+                                // Prepending the gifDiv to the "#gifs-appear-here" div in the HTML
+                                $("#gifs-appear-here").prepend(gifDiv);
+                            } if (length += 5) {
+                                var gifDiv2 = $("<div class='item2'>");
+                                var rating = results[i].rating;
+                                var personImage2 = $("<img>");
+                                personImage2.attr("src", results[i].images.fixed_height.url);
+                                gifDiv2.append(personImage2);
+                                $("#gifs-appear-here2").prepend(gifDiv2);
+                            } if (length += 10) {
+                                var gifDiv3 = $("<div class='item3'>");
+                                var rating = results[i].rating;
+                                var personImage3 = $("<img>");
+                                personImage3.attr("src", results[i].images.fixed_height.url);
+                                gifDiv3.append(personImage3);
+                                $("#gifs-appear-here3").prepend(gifDiv3);
+                            }
+                        }
+                    })
+                })
+                    // Adding the button to the HTML
+                    $("#teams-here").append(a);
+                }
+            }
+
+
+            $("#add-team").on("click", function (event) {
+                // event.preventDefault() prevents the form from trying to submit itself.
+                // We're using a form so that the user can hit enter instead of clicking the button if they want
+                event.preventDefault();
+                // This line will grab the text from the input box
+                var team = $("#team-input").val().trim();
+                // The team from the textbox is then added to our array
+                teams.push(team);
+                // calling renderButtons which handles the processing of our team array
+                renderButtons();
+            });
+
+            // Calling the renderButtons function at least once to display the initial list of teams
+            renderButtons();
+
+    </script>
+</body>
+
+</html>
